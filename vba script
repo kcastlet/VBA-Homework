@@ -1,0 +1,118 @@
+Sub stock_data()
+
+
+  For Each ws In Worksheets
+
+    ws.Cells(1, 9).Value = "Ticker"
+    ws.Cells(1, 12).Value = "Total_Vol"
+    ws.Cells(1, 10).Value = "Year Price Change"
+    ws.Cells(1, 11).Value = "Year % Price Change"
+      
+ ' Set initial variable for holding Ticker Name
+  Dim Ticker As String
+
+  Dim Open_Price As Double
+  
+  Dim Close_Price As Double
+  
+  Dim Counter As Integer
+  
+  Counter = 0
+  
+  ' Set initial variable for holding the total per Ticker Name
+  Ticker_Total = 0
+
+  ' Keep track of location for each Ticker Name in summary table
+  Dim Summary_Row As Integer
+  Summary_Row = 2
+
+  ' Loop through all Ticker Name volumes
+    LastRow = ws.Cells(Rows.Count, "G").End(xlUp).Row
+    
+    For i = 2 To LastRow
+  
+    
+    ' Check if still within same ticker name
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+
+      ' Set the Ticker Name
+      Ticker_Name = ws.Cells(i, 1).Value
+
+      ' Add to Ticker Total
+      Ticker_Total = Ticker_Total + ws.Cells(i, 7).Value
+
+      ' Print Ticker Name in Summary Table
+      ws.Range("I" & Summary_Row).Value = Ticker_Name
+
+      ' Print Ticker Amount to Summary Table
+      ws.Range("L" & Summary_Row).Value = Ticker_Total
+      
+      Close_Price = ws.Cells(i, 6).Value
+      
+      ' Print price change and % change for year
+      ws.Range("J" & Summary_Row).Value = Close_Price - Open_Price
+      
+      
+        If Open_Price = 0 Then
+         ws.Range("K" & Summary_Row).Value = Null
+     
+        Else
+        
+        ws.Range("K" & Summary_Row).Value = (Close_Price - Open_Price) / Open_Price
+      
+        End If
+      
+      Ticker_Total = 0
+      
+      Counter = 0
+
+      ' Add one to summary row
+      Summary_Row = Summary_Row + 1
+      
+
+    ' If cell immediately following a row is same name
+    Else
+
+        If Counter = 0 Then
+        
+        Open_Price = ws.Cells(i, 3).Value
+        
+        
+        End If
+        
+    ' Add to Ticker Total
+      Ticker_Total = Ticker_Total + ws.Cells(i, 7).Value
+      
+      Counter = Counter + 1
+      
+
+    End If
+      
+  Next i
+  
+  
+  LastRow = ws.Cells(Rows.Count, "I").End(xlUp).Row
+  
+  For i = 2 To LastRow
+    
+    ws.Cells(i, 11).Style = "percent"
+    
+    ws.Cells(i, 11).NumberFormat = "0.00%"
+  
+    
+    If ws.Cells(i, 10) < 0 Then
+        ws.Cells(i, 10).Interior.ColorIndex = 3
+        
+        ElseIf ws.Cells(i, 10) >= 0 Then
+        ws.Cells(i, 10).Interior.ColorIndex = 4
+  
+    
+    End If
+    
+    Next i
+    
+      
+Next ws
+
+
+End Sub
